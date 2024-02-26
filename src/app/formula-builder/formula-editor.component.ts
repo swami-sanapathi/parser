@@ -1,0 +1,2 @@
+@Component({})
+export class FormulaEditor {}
