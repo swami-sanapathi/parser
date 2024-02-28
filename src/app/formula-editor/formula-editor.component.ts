@@ -1,6 +1,9 @@
 import { Component, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
+import { OPERATORS } from '../const/operators';
+import { CstParser, Lexer, createToken } from 'chevrotain';
+import { createTokens } from '../compiler/tokens';
+import { createLexer } from '../compiler/lexer';
 @Component({
     selector: 'app-formula-editor',
     standalone: true,
@@ -14,7 +17,7 @@ import { FormsModule } from '@angular/forms';
             id="formula"
             required
         ></textarea>
-        <button (click)="validateFormula()">Validate</button>
+        <button (click)="validateExpression()">Validate</button>
     `,
     styles: `
         textarea {
@@ -42,67 +45,13 @@ import { FormsModule } from '@angular/forms';
 export default class FormulaEditor {
     formula = '';
 
-    /**
-     * create compiler (or) interpreter in javascript to validate and convert the given input to the desired output
-     * input: string --> "1 + 2 * 3"
-     * output: number --> 7
-     * input: string --> "leaf_node + 1", {leaf_node: 6}
-     * output: number --> 7
-     */
-    tokenizer(input: string) {
-        // validate the input 1+1
-        // convert the input to tokens
-        let current = 0;
-        const tokens = [];
-        while (current < input.length) {
-            let char = input[current];
-            if (char === '+') {
-                tokens.push({ type: 'PLUS', value: '+' });
-                current++;
-                continue;
-            }
-            if (char === '-') {
-                tokens.push({ type: 'MINUS', value: '-' });
-                current++;
-                continue;
-            }
-            if (char === '*') {
-                tokens.push({ type: 'MULTIPLY', value: '*' });
-                current++;
-                continue;
-            }
-            if (char === '/') {
-                tokens.push({ type: 'DIVIDE', value: '/' });
-                current++;
-                continue;
-            }
-
-            const WHITESPACE = /\s/;
-            if (WHITESPACE.test(char)) {
-                current++;
-                continue;
-            }
-
-            const NUMBERS = /[0-9]/;
-            if (NUMBERS.test(char)) {
-                let value = '';
-                while (NUMBERS.test(char)) {
-                    value += char;
-                    char = input[++current];
-                }
-                tokens.push({ type: 'NUMBER', value });
-                continue;
-            }
-            throw new TypeError(`I don't know what this character is: ` + char);
-        }
-        return tokens;
-    }
-
-    validateFormula() {
+    validateExpression() {
         try {
-            console.log('returns: --> ', this.tokenizer(this.formula));
-        } catch (error: unknown) {
-            prompt('Invalid input: ', this.formula);
+            const tokens = createTokens();
+            const lexer = createLexer(tokens, this.formula);
+            console.log('lexer result -->', lexer);
+        } catch (error) {
+            prompt((error as Error).message, this.formula);
         }
     }
 }
