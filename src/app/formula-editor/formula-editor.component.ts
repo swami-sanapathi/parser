@@ -1,9 +1,7 @@
-import { Component, input } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { OPERATORS } from '../const/operators';
-import { CstParser, Lexer, createToken } from 'chevrotain';
-import { createTokens } from '../compiler/tokens';
-import { createLexer } from '../compiler/lexer';
+import { parsePure } from '../compiler/grammer';
+
 @Component({
     selector: 'app-formula-editor',
     standalone: true,
@@ -14,10 +12,12 @@ import { createLexer } from '../compiler/lexer';
             cols="50"
             [(ngModel)]="formula"
             name="formula"
+            autofocus
             id="formula"
             required
+            (keyup.enter)="validateInput()"
         ></textarea>
-        <button (click)="validateExpression()">Validate</button>
+        <button (click)="validateInput()">Validate</button>
     `,
     styles: `
         textarea {
@@ -40,18 +40,12 @@ import { createLexer } from '../compiler/lexer';
             font-size: 16px;
         }
     `,
-    imports: [FormsModule]
+    imports: [FormsModule],
 })
 export default class FormulaEditor {
     formula = '';
 
-    validateExpression() {
-        try {
-            const tokens = createTokens();
-            const lexer = createLexer(tokens, this.formula);
-            console.log('lexer result -->', lexer);
-        } catch (error) {
-            prompt((error as Error).message, this.formula);
-        }
+    validateInput() {
+        console.log(parsePure(this.formula));
     }
 }
