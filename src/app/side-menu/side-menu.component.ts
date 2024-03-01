@@ -33,9 +33,6 @@ import { Component } from "@angular/core";
             text-decoration: none;
             color: #333;
         }
-
-
-        // highlight the side menu item that is selected
         a.active {
             font-weight: bold;
         }

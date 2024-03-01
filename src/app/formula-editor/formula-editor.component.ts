@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { parsePure } from '../compiler/grammer';
+import { validateExpression } from '../compiler/arithmatic/transformer';
 
 @Component({
     selector: 'app-formula-editor',
@@ -15,9 +15,15 @@ import { parsePure } from '../compiler/grammer';
             autofocus
             id="formula"
             required
-            (keyup.enter)="validateInput()"
+            (keydown.enter)="validateInput($event)"
         ></textarea>
         <button (click)="validateInput()">Validate</button>
+
+        @if (response()?.error) {
+            <div class="error">{{ response()?.error }}</div>
+        } @else if (response()?.value !== null) {
+            <div class="value">Output: {{ response()?.value }}</div>
+        }
     `,
     styles: `
         textarea {
@@ -39,13 +45,29 @@ import { parsePure } from '../compiler/grammer';
             padding: 10px 20px;
             font-size: 16px;
         }
+        .error {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 20px;
+        }
+        .value {
+            color: green;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 20px;
+        }
     `,
-    imports: [FormsModule],
+    imports: [FormsModule]
 })
 export default class FormulaEditor {
     formula = '';
+    response = signal<{ value: number; error: string } | null>(null);
 
-    validateInput() {
-        console.log(parsePure(this.formula));
+    validateInput($event?: Event) {
+        $event?.preventDefault();
+        if (!this.formula.trim()) return;
+        const { value, error } = validateExpression(this.formula);
+        this.response.set({ value, error });
     }
 }
