@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { validateExpression } from '../compiler/arithmatic/transformer';
+import { evaluateArithmeticExpression } from '../compiler/ts-arithmetic/transformer';
 
 @Component({
     selector: 'app-formula-editor',
@@ -62,12 +63,12 @@ import { validateExpression } from '../compiler/arithmatic/transformer';
 })
 export default class FormulaEditor {
     formula = '';
-    response = signal<{ value: number; error: string } | null>(null);
+    response = signal<{ value: number | null; error: string | null } | null>(null);
 
     validateInput($event?: Event) {
         $event?.preventDefault();
         if (!this.formula.trim()) return;
-        const { value, error } = validateExpression(this.formula);
+        const { value, error } = evaluateArithmeticExpression(this.formula);
         this.response.set({ value, error });
     }
 }
