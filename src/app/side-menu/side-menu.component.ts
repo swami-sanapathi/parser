@@ -1,16 +1,16 @@
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 
 @Component({
-    selector: "app-side-menu",
+    selector: 'app-side-menu',
     standalone: true,
     template: `
-        <div class="side-menu">
+        <!-- <div class="side-menu">
             <ul>
                 <li><a (click)="changeParser('a')">Arithmetic</a></li>
                 <li><a (click)="changeParser('j')">JSON</a></li>
                 <li><a (click)="changeParser('s')">SQL</a></li>
             </ul>
-        </div>
+        </div> -->
     `,
     styles: `
         .side-menu {
@@ -36,10 +36,8 @@ import { Component } from "@angular/core";
         a.active {
             font-weight: bold;
         }
-    `
+    `,
 })
 export class SideMenuComponent {
-    changeParser(parser: 'a' | 'j' | 's') {
-
-    }
+    changeParser(parser: 'a' | 'j' | 's') {}
 }

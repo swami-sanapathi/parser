@@ -1,7 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { validateExpression } from '../compiler/arithmatic/transformer';
-import { evaluateArithmeticExpression } from '../compiler/ts-arithmetic/transformer';
+import { evaluateArithmeticExpression } from '../compiler/arithmetic/transformer';
 
 @Component({
     selector: 'app-formula-editor',
@@ -23,7 +22,8 @@ import { evaluateArithmeticExpression } from '../compiler/ts-arithmetic/transfor
         @if (response()?.error) {
             <div class="error">{{ response()?.error }}</div>
         } @else if (response()?.value !== null) {
-            <div class="value">Output: {{ response()?.value }}</div>
+            <div class="value">Validated</div>
+            <!-- <div class="value">Output: {{ response()?.value }}</div> -->
         }
     `,
     styles: `
