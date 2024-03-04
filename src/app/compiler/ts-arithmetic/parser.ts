@@ -26,7 +26,7 @@ export class ArithmeticExpressionParser extends CstParser {
         });
 
         T.RULE("multiplicationExpression", () => {
-            T.SUBRULE(T.atomicExpression, { LABEL: "lhs" });
+            T.SUBRULE(T.atomicExpression, { LABEL: "lhs" }); 1 * 5
             T.MANY(() => {
                 T.CONSUME(MultiOperator);
                 T.SUBRULE2(T.atomicExpression, { LABEL: "rhs" });
