@@ -65,6 +65,7 @@ export default class ArithmeticCstVisitor extends CstVisitor {
 
 export function tokenizeInput(input: string) {
     const lexerResult = lexer.tokenize(input);
+    console.log('lexerResult -->',lexerResult)
     if (lexerResult.errors.length > 0) {
         return { error: lexerResult.errors[0].message, tokens: null };
     }
@@ -92,23 +93,27 @@ export function evaluateArithmeticExpression(input: string) {
     const response: { error: string | null; value: number | null } = { error: null, value: null };
 
     const lexerResult = tokenizeInput(input);
+    console.log('lexerResult -->: ', lexerResult);
     if (lexerResult.error) {
         response.error = lexerResult.error;
         return response;
     }
 
     const parserResult = parseTokens(lexerResult.tokens);
+    console.log('parserResult -->: ', parserResult);
     if (parserResult.error) {
         response.error = parserResult.error;
         return response;
     }
 
-    const visitorResult = visitCst(parserResult.cst);
-    if (visitorResult.error) {
-        response.error = visitorResult.error;
-        return response;
-    }
-
-    response.value = visitorResult.value;
+    response.value = 'true' as any;
     return response;
+    // const visitorResult = visitCst(parserResult.cst);
+    // // if (visitorResult.error) {
+    // //     response.error = visitorResult.error;
+    // //     return response;
+    // // }
+
+    // response.value = visitorResult.value;
+    // return response;
 }

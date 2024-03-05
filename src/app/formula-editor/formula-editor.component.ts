@@ -22,7 +22,7 @@ import { evaluateArithmeticExpression } from '../compiler/arithmetic/transformer
         @if (response()?.error) {
             <div class="error">{{ response()?.error }}</div>
         } @else if (response()?.value !== null) {
-            <div class="value">Validated</div>
+            <div class="value">Valid formula.</div>
             <!-- <div class="value">Output: {{ response()?.value }}</div> -->
         }
     `,
@@ -51,12 +51,27 @@ import { evaluateArithmeticExpression } from '../compiler/arithmetic/transformer
             margin-top: 10px;
             text-align: center;
             font-size: 20px;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 10px;
+            width: 50%;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .value {
+            text-align: center;
             color: green;
             margin-top: 10px;
-            text-align: center;
             font-size: 20px;
+            background-color: #ccc;
+            padding: 10px;
+            border-radius: 10px;
+            width: 50%;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+
         }
     `,
     imports: [FormsModule]

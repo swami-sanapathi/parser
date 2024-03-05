@@ -1,8 +1,15 @@
 import { Lexer, createToken } from 'chevrotain';
 
+/**
+ * user can enter the identifiers (`Employee`, `Leave`, `Employee_Exit`) but it should be
+ * after on keyword, not only Employee, it could be anything
+ * so create a generic token for it
+ */
+
+// the identifier regex should have a-zA-Z as the first character and \w* as the rest
 export const Identifier = createToken({
     name: 'Identifier',
-    pattern: /[a-zA-Z]\w*/
+    pattern: /[a-zA-Z]+(\.[a-zA-Z]+)?/
 });
 
 export const ArithmeticOperator = createToken({
@@ -62,14 +69,76 @@ export const WhiteSpace = createToken({
 
 export const Age = createToken({
     name: 'Age',
-    pattern: /age/
-    // longer_alt: Identifier,
+    pattern: /age/i,
+    longer_alt: Identifier
 });
 
 export const Salary = createToken({
     name: 'Salary',
-    pattern: /salary/
-    // longer_alt: Identifier,
+    pattern: /salary/i,
+    longer_alt: Identifier
+});
+
+// language: `on Employee validUntil instant filterBy(isActiveEmployee) aggregate count(Employee.EmployeeID)`
+
+export const On = createToken({
+    name: 'On',
+    pattern: /on/i,
+    longer_alt: Identifier
+});
+
+export const ValidUntil = createToken({
+    name: 'ValidUntil',
+    pattern: /validUntil/i,
+    longer_alt: Identifier
+});
+
+export const Instant = createToken({
+    name: 'Instant',
+    pattern: /instant/i,
+    longer_alt: Identifier
+});
+
+export const FilterBy = createToken({
+    name: 'FilterBy',
+    pattern: /filterBy/i,
+    longer_alt: Identifier
+});
+
+export const Aggregate = createToken({
+    name: 'Aggregate',
+    pattern: /aggregate/i,
+    longer_alt: Identifier
+});
+
+export const Count = createToken({
+    name: 'Count',
+    pattern: /count/i,
+    longer_alt: Identifier
+});
+
+export const Sum = createToken({
+    name: 'Sum',
+    pattern: /sum/i,
+    longer_alt: Identifier
+});
+
+export const Max = createToken({
+    name: 'Max',
+    pattern: /max/i,
+    longer_alt: Identifier
+});
+
+export const Min = createToken({
+    name: 'Min',
+    pattern: /min/i,
+    longer_alt: Identifier
+});
+
+export const Avg = createToken({
+    name: 'Avg',
+    pattern: /avg/i,
+    longer_alt: Identifier
 });
 
 export const allTokens = [
@@ -84,7 +153,41 @@ export const allTokens = [
     RParen,
     NumberLiteral,
     Age,
-    Salary
+    Salary,
+    On,
+    ValidUntil,
+    Instant,
+    FilterBy,
+    Aggregate,
+    Count,
+    Sum,
+    Max,
+    Min,
+    Avg,
+    Identifier
 ];
 
+const OyVeyErrorMessageProvider = {
+    buildUnexpectedCharactersMessage(
+        fullText: string,
+        startOffset: number,
+        length: number,
+        // eslint-disable-next-line  no-unused-vars -- template
+        line: number,
+        // eslint-disable-next-line  no-unused-vars -- template
+        column: number
+    ) {
+        return (
+            `Oy Vey!!! unexpected character:blah blah`
+        );
+    },
+
+    buildUnableToPopLexerModeMessage() {
+        return 'Oy Vey!!! unable to pop Lexer Mode';
+    }
+};
+
+// {
+//     errorMessageProvider: OyVeyErrorMessageProvider
+// }
 export const lexer = new Lexer(allTokens);
