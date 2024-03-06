@@ -20,7 +20,7 @@ import { evaluateArithmeticExpression } from '../compiler/arithmetic/transformer
         <button (click)="validateInput()">Validate</button>
 
         @if (response()?.error) {
-            <div class="error">{{ response()?.error }}</div>
+            <div class="error">Error: {{ response()?.error }}</div>
         } @else if (response()?.value !== null) {
             <div class="value">Valid formula.</div>
             <!-- <div class="value">Output: {{ response()?.value }}</div> -->

@@ -27,9 +27,12 @@ const customErrors = {
         previous: IToken;
         ruleName: string;
     }): string {
-        return ``;
+        console.log('options', options);
+        const expected = options.expected.name.toLowerCase();
+        return `Mismatched input, expecting: '${expected}'`;
     },
     buildNotAllInputParsedMessage(options: { firstRedundant: IToken; ruleName: string }): string {
+        // console.log('firstRedundant', options);
         return `Redundant input, expecting EOF but found: ${options.firstRedundant.image}`;
     },
     buildNoViableAltMessage(options: {
@@ -39,7 +42,11 @@ const customErrors = {
         customUserDescription?: string;
         ruleName: string;
     }): string {
-        return 'No viable alternative';
+        // console.log('expectedPathsPerAlt', options);
+        const { actual, previous } = options;
+        const unknownToken = actual[0];
+        const nearestPreviousTokenImage = previous.image ? ` near '${previous.image}'` : '';
+        return `Unknown token '${unknownToken.image}'${nearestPreviousTokenImage}`;
     },
     buildEarlyExitMessage(options: {
         expectedIterationPaths: TokenType[][];
@@ -48,18 +55,16 @@ const customErrors = {
         customUserDescription?: string;
         ruleName: string;
     }): string {
+        // console.log('options', options);
         return 'Early exit';
     }
 };
 
 export class ArithmeticExpressionParser extends CstParser {
     constructor() {
-        super(
-            allTokens
-            //     {
-            //     errorMessageProvider: customErrors
-            // }
-        );
+        super(allTokens, {
+            errorMessageProvider: customErrors
+        });
         this.createRules();
     }
 
@@ -122,37 +127,38 @@ export class ArithmeticExpressionParser extends CstParser {
 
         /**
          *
-         * language 1: `on Employee count(Employee.EmployeeID)`
+         * language 1: `on employee validUntil instant filterBy(isActiveEmployee) aggregate count(Employee.EmployeeID)`
          * Starts with `on` keyword
          * Followed by an identifier
          * Followed by an optional `validUntil` keyword
          * Followed by an optional `instant` keyword
          * Followed by an optional `filterBy` keyword
-         * Followed by an optional `aggregate` keyword
+         * Followed `aggregate` keyword and an aggregate function 
          * Followed by an optional `count`, `sum`, `min`, `max` keyword
-         * on employee aggregate count(Employee.EmployeeID)
-         * on employee filterBy(isActiveEmployee)  aggregate count(Employee.EmployeeID)
-         * on employee validUntil instant   aggregate count(Employee.EmployeeID) filterBy(isActiveEmployee)
-         * on employee validUntil instant aggregate count(Employee.EmployeeID)
-         * on employee validUntil instant filterBy(isActiveEmployee) aggregate count(Employee.EmployeeID)
-         */
+ 
+        * on employee aggregate count(Employee.EmployeeID)
+        * on employee filterBy(isActiveEmployee)  aggregate count(Employee.EmployeeID)
+        * on employee validUntil instant aggregate count(Employee.EmployeeID) filterBy(isActiveEmployee)
+        * on employee validUntil instant aggregate count(Employee.EmployeeID)
+        * on employee validUntil instant filterBy(isActiveEmployee) aggregate count(Employee.EmployeeID)
+        */
         T.RULE('onKey', () => {
             T.CONSUME(On);
             T.CONSUME(Identifier);
             T.OPTION(() => {
-                T.SUBRULE(T.optionalRule);
+                T.SUBRULE(T.optionalRules, { LABEL: 'opt1' });
             });
-            T.SUBRULE(T.minimumExpressionIsRequired);
+            T.SUBRULE(T.minimumExpressionIsRequired, { LABEL: 'minExp' });
             T.OPTION2(() => {
-                T.SUBRULE2(T.optionalRule);
+                T.SUBRULE2(T.optionalRules, { LABEL: 'opt2' });
             });
         });
 
         T.RULE('minimumExpressionIsRequired', () => {
-            T.SUBRULE(T.aggregateKey);
+            T.SUBRULE(T.aggregation);
         });
 
-        T.RULE('optionalRule', () => {
+        T.RULE('optionalRules', () => {
             T.OPTION(() => {
                 T.SUBRULE(T.validUntilKey);
             });
@@ -173,7 +179,7 @@ export class ArithmeticExpressionParser extends CstParser {
             T.CONSUME(RParen);
         });
 
-        T.RULE('aggregateKey', () => {
+        T.RULE('aggregation', () => {
             T.CONSUME(Aggregate);
             T.SUBRULE(T.aggregateFns);
             T.CONSUME(LParen);

@@ -1,4 +1,4 @@
-import { Lexer, createToken } from 'chevrotain';
+import { IToken, Lexer, createToken } from 'chevrotain';
 
 /**
  * user can enter the identifiers (`Employee`, `Leave`, `Employee_Exit`) but it should be
@@ -177,17 +177,16 @@ const OyVeyErrorMessageProvider = {
         // eslint-disable-next-line  no-unused-vars -- template
         column: number
     ) {
-        return (
-            `Oy Vey!!! unexpected character:blah blah`
-        );
+        // console.log('build lexer error', { fullText, startOffset, length, line, column });
+        return `Unexpected token: '${fullText}' `;
     },
 
-    buildUnableToPopLexerModeMessage() {
+    buildUnableToPopLexerModeMessage(token: IToken) {
+        // console.log('token', token);
         return 'Oy Vey!!! unable to pop Lexer Mode';
     }
 };
 
-// {
-//     errorMessageProvider: OyVeyErrorMessageProvider
-// }
-export const lexer = new Lexer(allTokens);
+export const lexer = new Lexer(allTokens, {
+    errorMessageProvider: OyVeyErrorMessageProvider
+});
