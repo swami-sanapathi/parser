@@ -35,7 +35,41 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 
 
-- on Employee validUntil instant filterBy(isActiveEmployee) aggregate count(Employee.EmployeeID)
+- on Employee filterBy(isActiveEmployee) aggregate count(Employee.EmployeeID)
 
 
-select count(emp_id) from Employees where status = 1 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Supported Keywords
+    - on
+    - validUntil
+    - instant
+    - filterBy
+    - aggregate
+    - count
+
+### TODO:
+    - Add Subject, Property, concept validations
+    - Query transformation
+    - Unit tests on lexer, parser, visitor and query transformation
+    - Custom Errors for lexer, parser, Subject, Property, concept validations
+    - Integrate remaining keywords 
+    - 
