@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { evaluateArithmeticExpression } from '../compiler/arithmetic/transformer';
 
@@ -71,7 +72,6 @@ import { evaluateArithmeticExpression } from '../compiler/arithmetic/transformer
             margin-top: 20px;
             margin-left: auto;
             margin-right: auto;
-
         }
     `,
     imports: [FormsModule]
@@ -79,11 +79,18 @@ import { evaluateArithmeticExpression } from '../compiler/arithmetic/transformer
 export default class FormulaEditor {
     formula = '';
     response = signal<{ value: number | null; error: string | null } | null>(null);
+    private http = inject(HttpClient);
 
     validateInput($event?: Event) {
         $event?.preventDefault();
         if (!this.formula.trim()) return;
         const { value, error } = evaluateArithmeticExpression(this.formula);
+
         this.response.set({ value, error });
+        if (value && typeof value === 'object') {
+            this.http.post('http://localhost:3000/api/query', { formula: value }).subscribe((res) => {
+                console.log(res);
+            });
+        }
     }
 }

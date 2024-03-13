@@ -72,6 +72,7 @@ export class ArithmeticExpressionParser extends CstParser {
     // language 1: `on Employee validUntil instant filterBy(isActiveEmployee) aggregate count(Employee.EmployeeID)`
     // language 2: all types of arithmetic expression with addition, subtraction, multiplication, division, and parenthesis, age, salary keywords
     // language can start with language 1 or language 2
+    // on Employee validUntil instant aggregate sum(days(currentStateDuration(Employment_Status)))
     declare expression: () => CstNode;
 
     createRules() {

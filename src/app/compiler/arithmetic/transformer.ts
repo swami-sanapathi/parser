@@ -4,8 +4,8 @@ import { parserInstance as parser } from './parser';
 
 const CstVisitor = parser.getBaseCstVisitorConstructor();
 interface IQueryOptions {
-    select: boolean;
-    table: string;
+    select?: boolean;
+    from: string;
     aggregateOpts?: {
         count: boolean;
         sum: boolean;
@@ -87,8 +87,7 @@ export default class ArithmeticCstVisitor extends CstVisitor {
 
     onKey(ctx: any) {
         let queryOptions: IQueryOptions = {
-            select: true,
-            table: ctx.Identifier[0].image // TODO: check identifier is available in the database
+            from: ctx.Identifier[0].image // TODO: check identifier is available in the database
         };
 
         if (ctx.minExp) {
@@ -105,8 +104,6 @@ export default class ArithmeticCstVisitor extends CstVisitor {
             const opts2 = this.visit(ctx.opt2);
             queryOptions = opts2 ? { ...queryOptions, ...opts2 } : queryOptions;
         }
-
-        console.log('queryOptions -->', queryOptions);
 
         /**
           {
@@ -133,18 +130,18 @@ export default class ArithmeticCstVisitor extends CstVisitor {
          */
 
         // prepare query like this `SELECT COUNT(Employee.EmployeeID) FROM Employee WHERE isActiveEmployee` from the above object
-
-        return generateQuery(queryOptions);
+        return queryOptions;
     }
 
     minimumExpressionIsRequired(ctx: any) {
-        return this.visit(ctx.aggregation);
+        const response = this.visit(ctx.aggregation);
+        return response;
     }
 
     optionalRules(ctx: any) {
         if (ctx && Object.keys(ctx).length === 0) return null;
 
-        const opts = { validUntil: false, where: false, whereOpts: null, aggregate: false, validUntilOpts: null };
+        const opts = { validUntil: false, where: false, whereOpts: null, validUntilOpts: null };
         if (ctx.filterByFn) {
             opts.where = true;
             opts.whereOpts = this.visit(ctx.filterByFn);
@@ -263,29 +260,7 @@ export function evaluateArithmeticExpression(input: string) {
         return response;
     }
 
-    console.log('visitorResult -->: ', visitorResult);
+    // console.log('visitorResult -->: ', visitorResult);
     response.value = visitorResult.value;
     return response;
-}
-
-function generateQuery(queryOpts: IQueryOptions) {
-    let query = '';
-
-    if (queryOpts.select) {
-        query += 'SELECT ';
-
-        if (queryOpts?.aggregateOpts?.count) {
-            query += `COUNT(${queryOpts.aggregationColumn}) `;
-        }
-    }
-
-    if (queryOpts.table) {
-        query += `FROM ${queryOpts.table} `;
-    }
-
-    if (queryOpts.where) {
-        query += `WHERE ${queryOpts?.whereOpts?.identifier}`;
-    }
-
-    return query;
 }
