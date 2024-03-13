@@ -9,17 +9,28 @@ app.use(cors());
 app.use(express.json());
 
 const handleAggregateOptions = (qb, aggregateOpts, aggregationColumn) => {
-    const operations = ['count', 'sum', 'max', 'min', 'avg'];
-    operations.forEach((op) => {
-        if (aggregateOpts && aggregateOpts[op]) {
-            qb[op](aggregationColumn);
-        }
-    });
+    if (aggregateOpts.count) {
+        qb.count(aggregationColumn);
+    }
+    if (aggregateOpts.sum) {
+        qb.sum(aggregationColumn);
+    }
+    if (aggregateOpts.avg) {
+        qb.avg(aggregationColumn);
+    }
+    if (aggregateOpts.min) {
+        qb.min(aggregationColumn);
+    }
+    if (aggregateOpts.max) {
+        qb.max(aggregationColumn);
+    }
 };
 
 app.post('/api/query', (req, res) => {
     const { formula } = req.body;
     const knexQb = knex({ client: 'mssql' }).queryBuilder();
+
+    if (!formula.from) return res.send({ error: 'FROM clause is not supported' });
 
     if (formula.from) {
         knexQb.from(formula.from);
@@ -27,6 +38,10 @@ app.post('/api/query', (req, res) => {
 
     if (formula.aggregate) {
         handleAggregateOptions(knexQb, formula.aggregateOpts, formula.aggregationColumn);
+    }
+
+    if(formula.where) {
+        knexQb.whereRaw(formula.whereOpts.identifier);
     }
 
     const query = knexQb.toString();
