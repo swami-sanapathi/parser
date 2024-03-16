@@ -4,7 +4,8 @@ import { EditorService } from './editor.service';
 declare const monaco: any;
 export const monacoConfigFactory = (http: HttpClient, service: EditorService) => {
     return {
-        onMonacoLoad: () => {
+        onMonacoLoad: async () => {
+            const { keywords, operators } = await service.getKeywords();
             monaco.languages.register({ id: 'mySpecialLanguage' });
             monaco.languages.setMonarchTokensProvider('mySpecialLanguage', {
                 tokenizer: {
@@ -18,7 +19,6 @@ export const monacoConfigFactory = (http: HttpClient, service: EditorService) =>
             });
             monaco.languages.registerCompletionItemProvider('mySpecialLanguage', {
                 provideCompletionItems: async () => {
-                    const { keywords, operators } = await service.getKeywords();
                     return {
                         suggestions: [
                             ...keywords.map((keyword) => ({
@@ -47,6 +47,7 @@ export const monacoConfigFactory = (http: HttpClient, service: EditorService) =>
                 ],
                 colors: { 'editor.foreground': '#000000', 'editor.background': '#EDF1F7' }
             });
+            monaco.editor.setTheme('myCoolTheme');
         }
     };
 };
