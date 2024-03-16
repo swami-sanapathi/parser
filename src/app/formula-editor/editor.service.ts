@@ -1,11 +1,24 @@
+// editor.service.ts
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
+
+export interface KeywordOperatorData {
+    keywords: { name: string }[];
+    operators: { name: string }[];
+}
 
 @Injectable()
 export class EditorService {
-    private http = inject(HttpClient);
+    constructor(private http: HttpClient) {}
 
-    getKeywords() {
-        return this.http.get('http://localhost:3000/api/editor/keywords');
+    async getKeywords(): Promise<KeywordOperatorData> {
+        try {
+            return (await this.http
+                .get<KeywordOperatorData>('http://localhost:3001/api/editor/keywords')
+                .toPromise()) as KeywordOperatorData;
+        } catch (error) {
+            console.error('Error fetching keywords:', error);
+            throw error; // Rethrow the error for handling in the component
+        }
     }
 }
