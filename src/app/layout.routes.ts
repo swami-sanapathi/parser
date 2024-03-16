@@ -1,13 +1,16 @@
-import { HttpClient } from '@angular/common/http';
-import { assertInInjectionContext, importProvidersFrom, inject, runInInjectionContext } from '@angular/core';
+import { HttpClient } from '@angular/common/http'; // Import for making HTTP requests
+import { importProvidersFrom, inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
-declare const monaco: any;
+declare const monaco: any; // Assuming global declaration
+interface KeywordOperatorData {
+    keywords: { name: string }[];
+    operators: { name: string }[];
+}
 const monacoConfigFactory = () => {
-        
-    const http = inject(HttpClient);
     return {
         onMonacoLoad: async () => {
+            const http = inject(HttpClient);
             let data: KeywordOperatorData = { keywords: [], operators: [] };
             http.get<KeywordOperatorData>('http://localhost:3001/api/editor/keywords').subscribe((res) => {
                 data = res;
@@ -71,12 +74,15 @@ const monacoConfigFactory = () => {
     };
 };
 
+// Route configuration with providers for loading Monaco and dynamic config
 export const routes: Routes = [
     {
         path: 'editor',
         loadComponent: () => import('./formula-editor/editor.component'),
-        providers: [importProvidersFrom(MonacoEditorModule.forRoot(monacoConfigFactory()))],
-        
+        providers: [
+            importProvidersFrom(MonacoEditorModule.forRoot(monacoConfigFactory())),
+            { provide: HttpClient, useClass: HttpClient }
+        ]
     },
     {
         path: '**',
@@ -84,8 +90,3 @@ export const routes: Routes = [
         pathMatch: 'full'
     }
 ];
-
-interface KeywordOperatorData {
-    keywords: { name: string }[];
-    operators: { name: string }[];
-}
