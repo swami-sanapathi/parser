@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 export interface KeywordOperatorData {
     keywords: { name: string }[];
     operators: { name: string }[];
+    attributes: { name: string }[];
 }
 
 @Injectable()

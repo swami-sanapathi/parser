@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 declare const monaco: any;
@@ -15,7 +15,7 @@ declare const monaco: any;
                 (onInit)="onInit($event)"
             ></ngx-monaco-editor>
             <span class="btn-span">
-                <button class="btn-cls" type="submit" (click)="getCode()">Get Code</button>
+                <button class="btn-cls" type="submit" (click)="getCode()">Validate</button>
             </span>
         </div>
     `,
@@ -42,7 +42,8 @@ declare const monaco: any;
             border-radius: 5px;
         }
     `,
-    imports: [MonacoEditorModule, FormsModule]
+    imports: [MonacoEditorModule, FormsModule],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class Editor {
     // jsonCode = ['{', '    "p1": "v3",', '    "p2": false', '}'].join('\n');
@@ -53,7 +54,7 @@ export default class Editor {
     // };
 
     code = signal('');
-    editorOptions = { language: 'mySpecialLanguage', theme: 'myCoolTheme' };
+    editorOptions = { language: 'dsl', theme: 'myCoolTheme'};
 
     onInit(editor: any) {
         console.log('editor is ready:', editor);

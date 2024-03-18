@@ -1,35 +1,49 @@
-import { HttpClient } from '@angular/common/http';
 import { EditorService } from './editor.service';
 
 declare const monaco: any;
-export const monacoConfigFactory = (http: HttpClient, service: EditorService) => {
+export const monacoConfigFactory = (editorService: EditorService) => {
     return {
         onMonacoLoad: async () => {
-            const { keywords, operators } = await service.getKeywords();
-            monaco.languages.register({ id: 'mySpecialLanguage' });
-            monaco.languages.setMonarchTokensProvider('mySpecialLanguage', {
+            const { keywords, operators, attributes } = await editorService.getKeywords();
+            console.log({ keywords, operators, attributes });
+            const keywordsRegex = keywords.map((keyword) => `\\b${keyword.name}\\b`).join('|');
+            const operatorsRegex = operators.map((operator) => `\\b${operator.name}\\b`).join('|');
+            const attributesRegex = attributes.map((attribute) => `\\b${attribute.name}\\b`).join('|');
+
+            monaco.languages.register({ id: 'dsl' });
+            monaco.languages.setMonarchTokensProvider('dsl', {
+                ignoreCase: true,
                 tokenizer: {
                     root: [
-                        [/\b(?:true|false)\b/, 'keyword'],
-                        [/\b(?:p1|p2)\b/, 'type'],
+                        [new RegExp(keywordsRegex), 'keyword'],
+                        [new RegExp(operatorsRegex), 'operator'],
+                        [new RegExp(attributesRegex), 'attributes'],
                         [/\b(?:[a-zA-Z_]\w*)\b/, 'identifier'],
                         [/\b(?:[0-9]+)\b/, 'number']
                     ]
                 }
             });
-            monaco.languages.registerCompletionItemProvider('mySpecialLanguage', {
+            monaco.languages.setLanguageConfiguration('dsl', {
+                brackets: [['(', ')']]
+            });
+            monaco.languages.registerCompletionItemProvider('dsl', {
                 provideCompletionItems: async () => {
                     return {
                         suggestions: [
                             ...keywords.map((keyword) => ({
                                 label: keyword.name,
-                                insertText: keyword.name, // Add this line
+                                insertText: keyword.name,
                                 kind: monaco.languages.CompletionItemKind.Keyword
                             })),
                             ...operators.map((operator) => ({
                                 label: operator.name,
-                                insertText: operator.name, // Add this line
+                                insertText: operator.name,
                                 kind: monaco.languages.CompletionItemKind.Operator
+                            })),
+                            ...attributes.map((attribute) => ({
+                                label: attribute.name,
+                                insertText: attribute.name,
+                                kind: monaco.languages.CompletionItemKind.Value
                             }))
                         ]
                     };
@@ -40,9 +54,10 @@ export const monacoConfigFactory = (http: HttpClient, service: EditorService) =>
                 base: 'vs',
                 inherit: true,
                 rules: [
-                    { token: 'keyword', foreground: '0000FF', fontStyle: 'bold' },
-                    { token: 'type', foreground: '008800' },
-                    { token: 'identifier', foreground: 'FF0000' },
+                    { token: 'keyword', foreground: '0000FF' },
+                    { token: 'operator', foreground: 'FF0000' },
+                    { token: 'attributes', foreground: 'FF00FF' },
+                    { token: 'identifier', foreground: '000000' },
                     { token: 'number', foreground: '0000FF' }
                 ],
                 colors: { 'editor.foreground': '#000000', 'editor.background': '#EDF1F7' }

@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { Routes } from '@angular/router';
 import { MonacoEditorModule, NGX_MONACO_EDITOR_CONFIG } from 'ngx-monaco-editor-v2';
@@ -15,7 +14,7 @@ export const routes: Routes = [
             {
                 provide: NGX_MONACO_EDITOR_CONFIG,
                 useFactory: monacoConfigFactory,
-                deps: [HttpClient, EditorService]
+                deps: [EditorService]
             }
         ]
     },
