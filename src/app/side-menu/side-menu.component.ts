@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
     selector: 'app-side-menu',
@@ -37,6 +37,7 @@ import { Component } from '@angular/core';
             font-weight: bold;
         }
     `,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SideMenuComponent {
     changeParser(parser: 'a' | 'j' | 's') {}
