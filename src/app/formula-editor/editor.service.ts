@@ -1,6 +1,6 @@
 // editor.service.ts
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 
 export interface KeywordOperatorData {
     keywords: { name: string }[];
@@ -8,9 +8,17 @@ export interface KeywordOperatorData {
     attributes: { name: string }[];
 }
 
+export interface CompileResult {
+    error?: string;
+    success: boolean;
+}
+
 @Injectable()
 export class EditorService {
     constructor(private http: HttpClient) {}
+    private response = signal<CompileResult>({ success: false });
+    isValid = computed(() => this.response().success);
+    errMsg = computed(() => this.response().error);
 
     async getKeywords(): Promise<KeywordOperatorData> {
         try {
@@ -21,5 +29,11 @@ export class EditorService {
             console.error('Error fetching keywords:', error);
             throw error; // Rethrow the error for handling in the component
         }
+    }
+
+    compileFormula(code: string) {
+        this.http.post<CompileResult>('http://localhost:3001/api/editor/compile', { code }).subscribe((res) => {
+            this.response.set(res);
+        });
     }
 }
